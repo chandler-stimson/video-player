@@ -77,7 +77,6 @@ document.addEventListener('keydown', e => {
       break;
     }
   }
-
 });
 
 keyboard.register = rule => rules.push(rule);

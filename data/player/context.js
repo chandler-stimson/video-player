@@ -1,12 +1,13 @@
 const filters = {};
+let c;
 
 const once = () => {
-  const context = new(window.AudioContext || window.webkitAudioContext);
+  c = new(window.AudioContext || window.webkitAudioContext);
   const video = document.querySelector('video');
-  const source = context.createMediaElementSource(video);
-  const gain = context.createGain();
+  const source = c.createMediaElementSource(video);
+  const gain = c.createGain();
   source.connect(gain);
-  gain.connect(context.destination);
+  gain.connect(c.destination);
 
   filters.gain = gain;
   document.removeEventListener('click', once);
@@ -16,6 +17,9 @@ document.addEventListener('click', once);
 const context = {
   get filters() {
     return filters;
+  },
+  get context() {
+    return c;
   }
 };
 

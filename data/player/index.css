@@ -20,6 +20,10 @@ body {
 @media screen and (max-width: 600px) {
   body[data-mode="expand"] {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr minmax(146px, 40vh);
+  }
+  body[data-mode="expand"][data-type="audio"] {
+    grid-template-rows: 66px 1fr !important;
   }
 }
 #video-container {
@@ -27,6 +31,10 @@ body {
   position: relative;
   overflow: hidden;
 }
+/* body[data-type="audio"][data-state="1"] #video-container,
+body[data-type="audio"][data-state="2"] #video-container {
+  filter: invert(1);
+} */
 body[data-state="-1"] #video-container::before {
   content: 'Drag media files or double-click to browse';
   position: absolute;
@@ -47,6 +55,7 @@ video {
 body[data-state="-1"] video {
   display: none;
 }
+
 #toolbar {
   display: flex;
   flex-direction: column;

@@ -28,5 +28,9 @@ video.addEventListener('volumechange', e => {
     'volume': e.target.volume
   });
 });
+video.addEventListener('boostchange', () => {
+  notify.display('Boost: ' + video.boost + 'B');
+});
+
 
 export default storage;

@@ -10,6 +10,9 @@ const speed = document.getElementById('speed');
 const boost = document.getElementById('boost');
 
 video.addEventListener('blur', () => video.focus());
+video.addEventListener('canplay', () => {
+  document.body.dataset.type = video.captureStream().getTracks().some(t => t.kind === 'video') ? 'video' : 'audio';
+});
 
 const scrollIntoView = e => {
   const rect = e.getBoundingClientRect();
@@ -123,7 +126,7 @@ const playlist = {
       video.currentTime = currentTime;
     }
     video.origin = s;
-    video.play().catch(e => notify.display(e.message, 10000));
+    video.play().catch(e => notify.display(e.message, 2000));
     window.setTimeout(() => video.focus(), 100);
   },
   stopVideo() {
