@@ -1,8 +1,9 @@
 import playlist from './playlist.js';
 import drag from './drag.js';
-import boost from './boost.js';
-import storage from './storage.js';
-import keyboard from './keyboard.js';
+import './context.js';
+import './boost.js';
+import './storage.js';
+import './keyboard.js';
 
 const args = new URLSearchParams(location.search);
 

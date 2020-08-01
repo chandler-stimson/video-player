@@ -1,4 +1,5 @@
-'use strict';
+/* global MediaMetadata */
+import notify from './notify.js';
 
 const root = document.getElementById('playlist');
 const video = document.querySelector('video');
@@ -7,7 +8,6 @@ const previous = document.getElementById('previous');
 const repeat = document.getElementById('repeat');
 const speed = document.getElementById('speed');
 const boost = document.getElementById('boost');
-const shuffle = document.getElementById('shuffle');
 
 video.addEventListener('blur', () => video.focus());
 
@@ -17,7 +17,7 @@ const scrollIntoView = e => {
   if (rect.top < 0 || rect.bottom > root.clientHeight) {
     e.scrollIntoView();
   }
-}
+};
 
 const stats = new WeakMap();
 let delayId;
@@ -109,7 +109,7 @@ const playlist = {
     video.playbackRate = parseInt(speed.dataset.mode);
     document.title = (s.name || s.src) + ' :: ' + chrome.runtime.getManifest().name;
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: document.title,
+      title: document.title
     });
 
     // active entry
@@ -123,7 +123,7 @@ const playlist = {
       video.currentTime = currentTime;
     }
     video.origin = s;
-    video.play();
+    video.play().catch(e => notify.display(e.message, 10000));
     window.setTimeout(() => video.focus(), 100);
   },
   stopVideo() {
@@ -212,12 +212,8 @@ root.addEventListener('click', e => {
     }
   }
 });
-previous.addEventListener('click', () => {
-  playlist.play(playlist.index - 1);
-})
-next.addEventListener('click', () => {
-  playlist.play(playlist.index + 1);
-})
+previous.addEventListener('click', () => playlist.play(playlist.index - 1));
+next.addEventListener('click', () => playlist.play(playlist.index + 1));
 
 repeat.addEventListener('click', e => {
   const modes = ['no-repeat', 'repeat-all', 'repeat-one'];
@@ -234,7 +230,9 @@ boost.addEventListener('click', e => {
   const modes = ['1b', '2b', '4b'];
   const index = (modes.indexOf(e.target.dataset.mode) + 1) % 3;
   boost.dataset.mode = modes[index];
-  video.boost = parseInt(modes[index]);
+  setTimeout(() => {
+    video.boost = parseInt(modes[index]);
+  }, 100);
 });
 
 export default playlist;

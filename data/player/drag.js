@@ -5,9 +5,9 @@ const drag = {
   }
 };
 
-const drop = async items => {
+const drop = async es => {
   const files = [];
-  const entries = items.map(f => f.webkitGetAsEntry ? f.webkitGetAsEntry() : ({
+  const entries = es.map(f => f.webkitGetAsEntry ? f.webkitGetAsEntry() : ({
     isFile: true,
     file(c) {
       c(f);

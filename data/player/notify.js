@@ -12,7 +12,7 @@ let id;
 notify.display = (msg, period = 750) => {
   toast.textContent = msg;
   clearTimeout(id);
-  id = setTimeout(() => toast.textContent = '', 750);
+  id = setTimeout(() => toast.textContent = '', period);
 };
 
 export default notify;
