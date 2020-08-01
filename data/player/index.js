@@ -4,6 +4,7 @@ import boost from './boost.js';
 import storage from './storage.js';
 import keyboard from './keyboard.js';
 
+const args = new URLSearchParams(location.search);
 
 drag.onDrag(files => playlist.loadVideo(files));
 
@@ -17,3 +18,9 @@ port.onMessage.addListener(request => {
     }]);
   }
 });
+
+if (args.has('src')) {
+  playlist.loadVideo([{
+    src: args.get('src')
+  }]);
+}

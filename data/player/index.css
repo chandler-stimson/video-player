@@ -17,6 +17,11 @@ body {
   fill: var(--fill-color);
   user-select: none;
 }
+@media screen and (max-width: 600px) {
+  body[data-mode="expand"] {
+    grid-template-columns: 1fr;
+  }
+}
 #video-container {
   display: flex;
   position: relative;
@@ -50,6 +55,11 @@ body[data-state="-1"] video {
 }
 body[data-mode=expand] #toolbar {
   width: 300px;
+}
+@media screen and (max-width: 600px) {
+  body[data-mode=expand] #toolbar {
+    width: unset;
+  }
 }
 #toolbar input[type=checkbox] {
   display: none;

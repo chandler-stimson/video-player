@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "Video Player",
   "description": "Web audio and video player with speed control and volume boosting",
   "permissions": [
@@ -25,5 +25,6 @@
       "background.js"
     ]
   },
-  "browser_action": {}
+  "browser_action": {},
+  "homepage_url": "https://add0n.com/video-player.html"
 }

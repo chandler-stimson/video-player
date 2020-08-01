@@ -1,3 +1,4 @@
+import notify from './notify.js';
 const storage = {};
 
 storage.set = prefs => new Promise(resolve => chrome.storage.local.set(prefs, resolve));
@@ -10,7 +11,6 @@ storage.get({
   'boost': 1, // volume boost
   'speed': 1
 }).then(prefs => {
-  console.log(prefs);
   document.getElementById('repeat').dataset.mode = prefs.repeat;
   document.getElementById('speed').dataset.mode = prefs.speed + 'x';
   document.querySelector('video').volume = prefs.volume;
@@ -23,7 +23,7 @@ document.getElementById('repeat').addEventListener('click', e => chrome.storage.
 }));
 document.getElementById('speed').addEventListener('click', e => chrome.storage.local.set({
   'speed': parseInt(e.target.dataset.mode)
-}));
+}, () => notify.display('Speed: ' + e.target.dataset.mode.toUpperCase())));
 document.querySelector('video').addEventListener('volumechange', e => {
   chrome.storage.local.set({
     'volume': e.target.volume
@@ -32,7 +32,7 @@ document.querySelector('video').addEventListener('volumechange', e => {
 document.querySelector('video').addEventListener('boostchange', e => {
   chrome.storage.local.set({
     'boost': e.target.boost
-  });
+  }, () => notify.display('Boost: ' + e.target.boost + 'X'));
 });
 
 export default storage;
