@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Player</title>
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google" content="notranslate"/>
+</head>
+<body data-state="-1">
+  <div id="video-container">
+    <video controls></video>
+  </div>
+  <div id="toolbar">
+    <ul id="playlist"></ul>
+
+    <div id="buttons">
+      <input type="checkbox" id="p-button" title="Toggle Playlist (Ctrl + P or Command + P)">
+      <label for="p-button" class="disabled" id="p-button-view">
+        <svg width="22" height="22" viewBox="0 0 22 22">
+          <rect width="16" height="2" x="3" y="3"/>
+          <rect width="16" height="2" x="3" y="9"/>
+          <rect width="16" height="2" x="3" y="15"/>
+        </svg>
+      </label>
+      <label class="disabled" id="shuffle" title="Shuffle Playlist">
+        <svg width="14" height="14" viewBox="0 0 16 16">
+          <path d="M6.6,5.2 L1.4,0 L0,1.4 L5.2,6.6 L6.6,5.2 L6.6,5.2 Z M10.5,0 L12.5,2 L0,14.6 L1.4,16 L14,3.5 L16,5.5 L16,0 L10.5,0 L10.5,0 Z M10.8,9.4 L9.4,10.8 L12.5,13.9 L10.5,15.9 L16,15.9 L16,10.4 L14,12.4 L10.8,9.4 L10.8,9.4 Z"/>
+        </svg>
+      </label>
+
+      <label id="repeat" data-mode="no-repeat" title="Repeat Mode: no repeat, repeat all, repeat one">
+        <svg width="22" height="22" viewBox="0 0 48 48">
+          <path d="M14 14h20v6l8-8-8-8v6H10v12h4v-8zm20 20H14v-6l-8 8 8 8v-6h24V26h-4v8zm-8-4V18h-2l-4 2v2h3v8h3z"/>
+          <path d="M14 14h20v6l8-8-8-8v6H10v12h4v-8zm20 20H14v-6l-8 8 8 8v-6h24V26h-4v8z"/>
+        </svg>
+      </label>
+
+      <label id="capture" class="disabled" title="Take a screenshot of the current view">
+        <svg width="22" height="22" viewBox="0 0 512 512">
+          <path d="M255.13,411.93a112,112,0,1,1,112-112A112.09,112.09,0,0,1,255.13,411.93Zm0-193.93a82,82,0,1,0,82,82A82.06,82.06,0,0,0,255.13,218Z"/><path d="M137,398a14.46,14.46,0,0,1-1.47-.07c-.49-.05-1-.13-1.46-.22s-1-.22-1.43-.36a14.25,14.25,0,0,1-1.38-.5,14.49,14.49,0,0,1-1.32-.62,14.69,14.69,0,0,1-1.27-.76c-.4-.27-.8-.56-1.18-.87s-.75-.65-1.1-1-.68-.72-1-1.1-.6-.78-.87-1.18a14.6,14.6,0,0,1-.75-1.27q-.34-.65-.63-1.32c-.19-.45-.35-.92-.5-1.39s-.26-.94-.36-1.42-.17-1-.22-1.46A14.33,14.33,0,0,1,122,383a14.66,14.66,0,0,1,.07-1.48c.05-.48.13-1,.22-1.45s.22-1,.36-1.43.31-.93.5-1.38.4-.89.63-1.32a14.6,14.6,0,0,1,.75-1.27c.27-.4.56-.8.87-1.18s.65-.75,1-1.1.72-.68,1.1-1,.78-.6,1.18-.87a16.67,16.67,0,0,1,2.59-1.38c.45-.19.92-.35,1.38-.5s1-.26,1.43-.36,1-.17,1.46-.22a16.15,16.15,0,0,1,2.95,0c.48.05,1,.13,1.45.22s1,.22,1.42.36.94.31,1.39.5.89.4,1.32.63a15.58,15.58,0,0,1,2.45,1.62c.38.31.75.65,1.09,1s.68.72,1,1.1.6.78.87,1.18a14.6,14.6,0,0,1,.75,1.27q.34.65.63,1.32c.19.45.35.92.5,1.38s.26.95.36,1.43.17,1,.22,1.45A14.66,14.66,0,0,1,152,383a14.33,14.33,0,0,1-.07,1.47c-.05.49-.13,1-.22,1.46s-.22,1-.36,1.42-.31.94-.5,1.39-.4.89-.63,1.32a14.6,14.6,0,0,1-.75,1.27c-.27.4-.57.8-.87,1.18s-.65.75-1,1.1-.71.68-1.09,1a16.64,16.64,0,0,1-2.45,1.63c-.43.22-.87.44-1.32.62a13.53,13.53,0,0,1-1.39.5c-.46.14-.94.26-1.42.36s-1,.17-1.45.22A14.66,14.66,0,0,1,137,398Z"/><path d="M441.13,461.82h-372a15,15,0,0,1-15-15V179.18a15,15,0,0,1,15-15h80.61l24-47.9A15,15,0,0,1,187.13,108h136a15,15,0,0,1,13.42,8.28l24,47.9h80.6a15,15,0,0,1,15,15V446.82A15,15,0,0,1,441.13,461.82Zm-357-30h342V194.18H351.27a15,15,0,0,1-13.41-8.28l-24-47.9H196.4l-24,47.9A15,15,0,0,1,159,194.18H84.13Z"/>
+        </svg>
+      </label>
+
+      <label id="speed" data-mode="1x" title="Adjust player's speed (1X [default], 2X, 4X, and 8X) (Ctrl + X or Command + X)">
+        <svg width="22" height="22" viewBox="0 0 48 48">
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">1X</text>
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">2X</text>
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">4X</text>
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">8X</text>
+        </svg>
+      </label>
+      <label id="boost" data-mode="1b" title="Adjust player's volume boost (1B [default], 2B, 4B) (Ctrl + B or Command + B)">
+        <svg width="22" height="22" viewBox="0 0 48 48">
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">1B</text>
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">2B</text>
+         <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="28">4B</text>
+        </svg>
+      </label>
+
+      <label class="disabled" id="previous" title="Play Previous Song (Ctrl + Shift + P or Command + Shift + P)">
+        <svg width="16" height="16" viewBox="0 0 32 32">
+          <path d="M29.46,5.11a1,1,0,0,0-1,.08L18,12.63V6a1,1,0,0,0-1.58-.81l-14,10a1,1,0,0,0,0,1.63l14,10A1,1,0,0,0,18,26V19.37l10.42,7.44A1,1,0,0,0,30,26V6A1,1,0,0,0,29.46,5.11Z"/>
+        </svg>
+      </label>
+      <label class="disabled" id="next" title="Play Next Song (Ctrl + Shift + N or Command + Shift + N)">
+        <svg width="16" height="16" viewBox="0 0 24 24">
+          <path d="M22.2,10.6l-9-5.4c-1-0.6-2.2,0.2-2.2,1.4v3.2L3.2,5.2C2.2,4.6,1,5.4,1,6.6v10.7c0,1.2,1.2,2,2.2,1.4l7.8-4.6   v3.2c0,1.2,1.2,2,2.2,1.4l9-5.4C23.3,12.8,23.3,11.2,22.2,10.6z" id="next"/>
+        </svg>
+      </label>
+    </div>
+  </div>
+  <script type="module" src="index.js"></script>
+</body>
+</html>

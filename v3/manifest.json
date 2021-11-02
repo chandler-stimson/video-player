@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "version": "0.2.0",
+  "name": "Video Player",
+  "description": "__MSG_description__",
+  "default_locale": "en",
+  "permissions": [
+    "storage",
+    "contextMenus"
+  ],
+  "offline_enabled": true,
+  "icons": {
+    "16": "data/icons/16.png",
+    "19": "data/icons/19.png",
+    "32": "data/icons/32.png",
+    "38": "data/icons/38.png",
+    "48": "data/icons/48.png",
+    "64": "data/icons/64.png",
+    "128": "data/icons/128.png",
+    "256": "data/icons/256.png",
+    "512": "data/icons/512.png"
+  },
+  "background": {
+    "service_worker": "worker.js"
+  },
+  "action": {},
+  "homepage_url": "https://add0n.com/video-player.html",
+  "commands": {
+    "_execute_action": {
+      "description": "Press the action button"
+    }
+  }
+}
