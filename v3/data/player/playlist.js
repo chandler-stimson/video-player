@@ -12,7 +12,12 @@ const capture = document.getElementById('capture');
 
 video.addEventListener('blur', () => video.focus());
 video.addEventListener('canplay', () => {
-  document.body.dataset.type = video.captureStream().getTracks().some(t => t.kind === 'video') ? 'video' : 'audio';
+  try {
+    document.body.dataset.type = video.captureStream().getTracks().some(t => t.kind === 'video') ? 'video' : 'audio';
+  }
+  catch (e) {
+    console.log(e);
+  }
 });
 
 const scrollIntoView = e => {
@@ -104,6 +109,7 @@ const playlist = {
     });
 
     const s = playlist.entries[playlist.index];
+
     if (s.name) {
       const u = URL.createObjectURL(s);
       video.src = u;

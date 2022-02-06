@@ -1,5 +1,7 @@
 'use strict';
 
+self.importScripts('context.js');
+
 const storage = {
   get(prefs) {
     return new Promise(resolve => chrome.storage.local.get(prefs, resolve));
@@ -42,42 +44,6 @@ chrome.action.onClicked.addListener(() => {
     chrome.runtime.lastError;
     if (r !== true) {
       player.open();
-    }
-  });
-});
-
-{
-  const startup = () => {
-    chrome.contextMenus.create({
-      id: 'play-media',
-      title: 'Play with Video Player',
-      contexts: ['audio', 'video']
-    });
-    chrome.contextMenus.create({
-      title: 'Play with Video Player',
-      id: 'play-link',
-      contexts: ['link'],
-      targetUrlPatterns: [
-        'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv',
-        'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc'
-      ].map(a => '*://*/*.' + a)
-    });
-  };
-  chrome.runtime.onStartup.addListener(startup);
-  chrome.runtime.onInstalled.addListener(startup);
-}
-chrome.contextMenus.onClicked.addListener(info => {
-  const src = info.srcUrl || info.linkUrl;
-
-  chrome.runtime.sendMessage({
-    method: 'open',
-    src
-  }, r => {
-    chrome.runtime.lastError;
-    if (r !== true) {
-      player.open({
-        src
-      });
     }
   });
 });

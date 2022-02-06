@@ -17,6 +17,7 @@ body {
   fill: var(--fill-color);
   user-select: none;
 }
+
 @media screen and (max-width: 600px) {
   body[data-mode="expand"] {
     grid-template-columns: 1fr;
@@ -31,10 +32,7 @@ body {
   position: relative;
   overflow: hidden;
 }
-/* body[data-type="audio"][data-state="1"] #video-container,
-body[data-type="audio"][data-state="2"] #video-container {
-  filter: invert(1);
-} */
+
 body[data-state="-1"] #video-container::before {
   content: 'Drag media files or double-click to browse';
   position: absolute;
@@ -65,6 +63,7 @@ body[data-state="-1"] video {
 body[data-mode=expand] #toolbar {
   width: 300px;
 }
+
 @media screen and (max-width: 600px) {
   body[data-mode=expand] #toolbar {
     width: unset;
@@ -171,5 +170,9 @@ input[type=checkbox]:checked + label > svg {
   display: none;
 }
 #boost[data-mode="4b"] text:not(:nth-child(3)) {
+  display: none;
+}
+
+.hidden {
   display: none;
 }

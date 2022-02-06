@@ -62,6 +62,15 @@ const drop = async es => {
 document.addEventListener('dragover', e => e.preventDefault());
 document.addEventListener('drop', e => {
   e.preventDefault();
+
+  const src = e.dataTransfer.getData('text/uri-list');
+
+  if (src) {
+    for (const c of drag.cs) {
+      c([{src}]);
+    }
+  }
+
   drop([...e.dataTransfer.items]);
 });
 const container = document.getElementById('video-container');
