@@ -13,8 +13,19 @@
       contexts: ['link'],
       targetUrlPatterns: [
         'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv',
-        'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc'
+        'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc', 'png'
       ].map(a => '*://*/*.' + a)
+    });
+
+    chrome.contextMenus.create({
+      id: 'buttons',
+      title: 'Show/Hide Player Buttons',
+      contexts: ['action']
+    });
+    chrome.contextMenus.create({
+      id: 'test',
+      title: 'Test Player',
+      contexts: ['action']
     });
 
     chrome.storage.local.get({
@@ -23,11 +34,6 @@
       'speed-button': true,
       'boost-button': true
     }, prefs => {
-      chrome.contextMenus.create({
-        id: 'buttons',
-        title: 'Show/Hide Player Buttons',
-        contexts: ['action']
-      });
       chrome.contextMenus.create({
         id: 'repeat-button',
         title: 'Repeat Button',
@@ -65,8 +71,14 @@
   chrome.runtime.onStartup.addListener(startup);
   chrome.runtime.onInstalled.addListener(startup);
 }
-chrome.contextMenus.onClicked.addListener(info => {
-  if (info.menuItemId.endsWith('-button')) {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'test') {
+    chrome.tabs.create({
+      url: 'https://webbrowsertools.com/test-download-with/',
+      index: tab.index + 1
+    });
+  }
+  else if (info.menuItemId.endsWith('-button')) {
     chrome.storage.local.set({
       [info.menuItemId]: info.checked
     });

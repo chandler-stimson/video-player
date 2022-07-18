@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "name": "Video Player",
   "description": "__MSG_description__",
   "default_locale": "en",
@@ -24,6 +24,9 @@
     "service_worker": "worker.js"
   },
   "action": {},
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
   "homepage_url": "https://add0n.com/video-player.html",
   "commands": {
     "_execute_action": {
