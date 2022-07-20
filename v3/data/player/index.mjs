@@ -34,6 +34,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
 // show/hide buttons
 {
   const update = () => chrome.storage.local.get({
+    'add-button': true,
     'repeat-button': true,
     'capture-button': true,
     'speed-button': true,
@@ -45,7 +46,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   });
   update();
   chrome.storage.onChanged.addListener(ps => {
-    if (ps['repeat-button'] || ps['capture-button'] || ps['speed-button'] || ps['boost-button']) {
+    if (ps['add-button'] || ps['repeat-button'] || ps['capture-button'] || ps['speed-button'] || ps['boost-button']) {
       update();
     }
   });

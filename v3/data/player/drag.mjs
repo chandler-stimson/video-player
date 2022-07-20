@@ -57,7 +57,7 @@ const drop = async es => {
       c(files);
     }
   }
-}
+};
 
 document.addEventListener('dragover', e => e.preventDefault());
 document.addEventListener('drop', e => {
@@ -74,18 +74,19 @@ document.addEventListener('drop', e => {
   drop([...e.dataTransfer.items]);
 });
 const container = document.getElementById('video-container');
+
+document.getElementById('file').onchange = e => {
+  const input = e.target;
+  if (input.files.length) {
+    drop([...input.files]);
+  }
+  file.value = '';
+};
+
 container.addEventListener('dblclick', e => {
   if (e.target === container) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.accept = 'video/*, audio/*';
-    input.onchange = () => {
-      if (input.files.length) {
-        drop([...input.files]);
-      }
-    };
-    input.click();
+    const file = document.getElementById('file');
+    file.click();
   }
 });
 

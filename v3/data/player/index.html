@@ -14,6 +14,12 @@
     <ul id="playlist"></ul>
 
     <div id="buttons">
+      <input type="file" id="file" accept="video/*, audio/*" multiple class="hidden">
+      <label id="add" for="file" title="Open local media file">
+        <svg viewBox="0 0 512 512">
+          <polygon points="448,224 288,224 288,64 224,64 224,224 64,224 64,288 224,288 224,448 288,448 288,288 448,288"/>
+        </svg>
+      </label>
       <input type="checkbox" id="p-button" title="Toggle Playlist (Ctrl + P or Command + P)">
       <label for="p-button" class="disabled" id="p-button-view">
         <svg width="22" height="22" viewBox="0 0 22 22">
