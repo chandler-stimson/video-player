@@ -80,7 +80,7 @@ document.getElementById('file').onchange = e => {
   if (input.files.length) {
     drop([...input.files]);
   }
-  file.value = '';
+  e.target.value = '';
 };
 
 container.addEventListener('dblclick', e => {
@@ -89,5 +89,20 @@ container.addEventListener('dblclick', e => {
     file.click();
   }
 });
+
+// ChromeOS
+if (self.launchQueue) {
+  self.launchQueue.setConsumer(async launchParams => {
+    if (!launchParams.files || !launchParams.files.length) {
+      return;
+    }
+    const files = [];
+    for (const fileHandle of launchParams.files) {
+      const file = await fileHandle.getFile();
+      files.push(file);
+    }
+    drop(files);
+  });
+}
 
 export default drag;

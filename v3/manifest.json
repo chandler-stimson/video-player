@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "name": "Video Player",
   "description": "__MSG_description__",
   "default_locale": "en",
@@ -32,5 +32,23 @@
     "_execute_action": {
       "description": "Press the action button"
     }
-  }
+  },
+  "file_handlers": [{
+    "action": "/data/player/index.html",
+    "name": "Open with MediaPlayer",
+    "accept": {
+      "video/avi": [".avi"],
+      "video/mp4": [".mp4"],
+      "video/webm": [".webm"],
+      "video/x-flv": [".flv"],
+      "video/quicktime": [".mov"],
+      "video/ogg": [".ogv"],
+      "video/3gpp": [".3gp"],
+      "video/mpeg": [".mpg"],
+      "video/x-ms-wmv": [".wmv"],
+      "video/x-matroska": [".mkv"],
+      "video/dvd": [".vob"]
+    },
+    "launch_type": "single-client"
+  }]
 }
