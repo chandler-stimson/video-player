@@ -1,10 +1,11 @@
-/* global MediaMetadata, muxjs */
+/* global muxjs */
 import notify from './notify.mjs';
 import stream, {abort} from './stream.mjs';
 import hls from './hls.mjs';
 
 const root = document.getElementById('playlist');
 const video = document.querySelector('video');
+video.crossOrigin = 'anonymous';
 const next = document.getElementById('next');
 const previous = document.getElementById('previous');
 const repeat = document.getElementById('repeat');
@@ -18,7 +19,7 @@ video.addEventListener('canplay', () => {
     document.body.dataset.type = video.captureStream().getTracks().some(t => t.kind === 'video') ? 'video' : 'audio';
   }
   catch (e) {
-    console.log(e);
+    document.body.dataset.type = 'video';
   }
 });
 
@@ -122,18 +123,21 @@ const playlist = {
         fileMap: s.fileMap
       }, {
         startTime: stats.get(s),
-        onError: hlsFailure
+        onError: hlsFailure,
+        forced: s.engine === 'hls'
       });
     }
     else if (!s.name && hls.supported(s.src)) {
       engine = hls.attach(video, s.src, {
         startTime: stats.get(s),
-        onError: hlsFailure
+        onError: hlsFailure,
+        forced: s.engine === 'hls'
       });
     }
 
+    console.info('Playing via', engine ? engine : 'HTML5 Video Player');
+
     if (engine === 'hls') {
-      console.info('Playing via HLS.js');
       // hls.js drives the video element
     }
     else if (s.playlist) {
@@ -164,9 +168,32 @@ const playlist = {
       if (currentTime !== undefined) {
         video.currentTime = currentTime;
       }
-      video.play().catch(e => {
+      video.play().catch(async e => {
         const src = video.src;
         notify.display(e.message + ' Fallback Decoding...', 10000);
+
+        const s = video.origin;
+        if (s && !s.playlist && !s.name && s.src && !video.src.startsWith('blob:')) {
+          const b = await new Promise(resolve => {
+            corsBlocked(s.src, b => resolve(b)).then(b => {
+              if (!b) {
+                resolve(false);
+              }
+            }).catch(e => resolve(false));
+          });
+          // b === true if there is a permission request granted so the playback restarts.
+          // There is no need for FFmpeg fallback
+          if (b) {
+            return;
+          }
+        }
+        // if engine is native it also can be HLS. Since HLS module only returns "native"
+        if (engine === 'native' && s.engine !== 'hls') {
+          s.engine = 'hls';
+          playlist.play(playlist.index);
+          return;
+        }
+
         console.info('Playing via FFmpeg.wasm fallback decoder');
 
         const mediaSource = new MediaSource();
@@ -218,16 +245,7 @@ const playlist = {
           done = true;
           pump();
         }).catch(e => {
-          if (e instanceof TypeError) {
-            corsBlocked(src).then(blocked => {
-              if (!blocked) {
-                notify.display('Decoding failed: ' + e.message, 10000);
-              }
-            });
-          }
-          else {
-            notify.display('Decoding failed: ' + e.message, 10000);
-          }
+          notify.display('Decoding failed: ' + e.message, 10000);
         });
       });
     }
@@ -290,40 +308,41 @@ const originOf = url => {
     return origin.startsWith('http') ? origin : null;
   }
   catch (e) {
-    console.log(e);
+    console.error(e);
     return null;
   }
 };
 
-const accessPrompt = origin => {
-  chrome.permissions.contains({
-    origins: [origin + '/*']
-  }, granted => {
-    if (granted) {
-      notify.display('Cannot load ' + origin, 10000);
-    }
-    else {
-      notify.prompt('Cannot load ' + origin, 'Grant Access', () => {
-        chrome.permissions.request({
-          origins: [origin + '/*']
-        }, ok => {
-          if (ok) {
-            playlist.play(playlist.index);
-          }
-          else {
-            notify.display('Permission denied', 10000);
-          }
-        });
+const accessPrompt = (origin, callback = () => {}) => chrome.permissions.contains({
+  origins: [origin + '/*']
+}, granted => {
+  if (granted) {
+    notify.display('Cannot load ' + origin, 10000);
+    callback(false);
+  }
+  else {
+    notify.prompt('Cannot load ' + origin, 'Grant Access', () => {
+      chrome.permissions.request({
+        origins: [origin + '/*']
+      }, ok => {
+        if (ok) {
+          playlist.play(playlist.index);
+          callback(true);
+        }
+        else {
+          notify.display('Permission denied', 10000);
+          callback(false);
+        }
       });
-    }
-  });
-};
+    });
+  }
+});
 
-const corsBlocked = url => {
+const corsBlocked = (url, callback = () => {}) => {
   const origin = originOf(url);
   if (origin) {
     return fetch(url).then(() => false, () => {
-      accessPrompt(origin);
+      accessPrompt(origin, callback);
       return true;
     });
   }
@@ -332,13 +351,6 @@ const corsBlocked = url => {
 
 const hlsFailure = e => {
   playlist.state = 0;
-  if (e.needsPermission && e.url) {
-    const origin = originOf(e.url);
-    if (origin) {
-      accessPrompt(origin);
-      return;
-    }
-  }
   notify.display('HLS: ' + e.message, 10000);
 };
 
@@ -348,10 +360,6 @@ video.addEventListener('timeupdate', () => {
 video.addEventListener('abort', () => playlist.state = 0);
 video.addEventListener('error', () => {
   playlist.state = 0;
-  const s = video.origin;
-  if (engine !== 'hls' && s && !s.playlist && !s.name && s.src && !video.src.startsWith('blob:')) {
-    corsBlocked(s.src);
-  }
 });
 video.addEventListener('emptied', () => playlist.state = 0);
 video.addEventListener('ended', () => {

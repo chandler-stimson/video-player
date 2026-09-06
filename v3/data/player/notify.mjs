@@ -9,7 +9,7 @@ toast.style = `
 document.body.appendChild(toast);
 
 let id;
-notify.display = (msg, period = 750) => {
+notify.display = (msg, period = 3000) => {
   toast.textContent = msg;
   clearTimeout(id);
   id = setTimeout(() => toast.textContent = '', period);

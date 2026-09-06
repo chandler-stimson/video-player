@@ -42,7 +42,7 @@ const rules = [{
       v.volume = volume;
     }
     catch (e) {
-      console.log(volume, e);
+      console.error(volume, e);
     }
     notify.display('Volume: ' + (v.volume * 100).toFixed(0) + '%');
     return true;

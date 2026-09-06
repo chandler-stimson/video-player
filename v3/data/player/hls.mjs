@@ -130,12 +130,16 @@ const detach = () => {
 
 const attach = (video, source, {
   startTime = 0,
-  onError = () => {}
+  onError = () => {},
+  forced = false
 } = {}) => {
   detach();
+
   const local = typeof source !== 'string';
-  if (video.canPlayType(NATIVE_TYPE) || !self.Hls || !Hls.isSupported()) {
-    return 'native';
+  if (forced !== true) {
+    if (video.canPlayType(NATIVE_TYPE) || !self.Hls || !Hls.isSupported()) {
+      return 'native';
+    }
   }
 
   const hls = new Hls(local ? localLoaders(source.fileMap) : {});
@@ -147,8 +151,7 @@ const attach = (video, source, {
     detach();
     onError({
       message: data.details || 'HLS error',
-      url: data.url,
-      needsPermission: !local && data.type === Hls.ErrorTypes.NETWORK_ERROR && !data.response
+      url: data.url
     });
   });
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
