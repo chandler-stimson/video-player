@@ -14,6 +14,19 @@ notify.display = (msg, period = 750) => {
   clearTimeout(id);
   id = setTimeout(() => toast.textContent = '', period);
 };
+notify.prompt = (msg, label, onclick) => {
+  notify.display(msg, 30000);
+  const a = document.createElement('a');
+  a.href = '#';
+  a.textContent = label;
+  a.style = 'margin-left: 5px; color: #4da3ff;';
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    notify.clear();
+    onclick();
+  });
+  toast.appendChild(a);
+};
 notify.clear = () => {
   toast.textContent = '';
   clearTimeout(id);

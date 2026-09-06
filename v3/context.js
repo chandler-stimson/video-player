@@ -2,6 +2,11 @@
 
 {
   const startup = () => {
+    if (startup.done) {
+      return;
+    }
+    startup.done = true;
+
     chrome.contextMenus.create({
       id: 'play-media',
       title: 'Play with Video Player',
@@ -13,6 +18,7 @@
       contexts: ['link'],
       targetUrlPatterns: [
         'avi', 'mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', 'mpg', 'wmv', 'swf', 'mkv',
+        'm3u8', 'm3u',
         'pcm', 'wav', 'aac', 'ogg', 'wma', 'flac', 'mid', 'mka', 'm4a', 'voc'
       ].map(a => '*://*/*.' + a)
     });

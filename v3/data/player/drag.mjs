@@ -16,6 +16,9 @@ const drop = async es => {
 
   const checkEntry = async entry => {
     const file = await new Promise(resolve => entry.file(resolve));
+    if (entry.fullPath) {
+      file.path = entry.fullPath.replace(/^\//, '');
+    }
     if (file.type) {
       if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
         files.push(file);

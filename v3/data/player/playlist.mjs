@@ -1,6 +1,7 @@
 /* global MediaMetadata, muxjs */
 import notify from './notify.mjs';
 import stream from './stream.mjs';
+import hls from './hls.mjs';
 
 const root = document.getElementById('playlist');
 const video = document.querySelector('video');
@@ -73,6 +74,7 @@ const playlist = {
       delayId = setTimeout(() => playlist.play(index, 0), delay);
       return;
     }
+    hls.detach();
     if (video.src) {
       URL.revokeObjectURL(video.src);
     }
@@ -111,7 +113,30 @@ const playlist = {
 
     const s = playlist.entries[playlist.index];
 
-    if (s.name) {
+    let engine = null;
+    if (s.playlist) {
+      engine = hls.attach(video, {
+        file: s.file,
+        fileMap: s.fileMap
+      }, {
+        startTime: stats.get(s),
+        onError: hlsFailure
+      });
+    }
+    else if (!s.name && hls.supported(s.src)) {
+      engine = hls.attach(video, s.src, {
+        startTime: stats.get(s),
+        onError: hlsFailure
+      });
+    }
+
+    if (engine === 'hls') {
+      // hls.js drives the video element
+    }
+    else if (s.playlist) {
+      video.src = URL.createObjectURL(s.file);
+    }
+    else if (s.name) {
       const u = URL.createObjectURL(s);
       video.src = u;
     }
@@ -130,50 +155,52 @@ const playlist = {
     }
     s.e.classList.add('active');
     scrollIntoView(s.e);
-    const currentTime = stats.get(s);
-    if (currentTime !== undefined) {
-      video.currentTime = currentTime;
-    }
     video.origin = s;
-    video.play().catch(e => {
-      const src = video.src;
-      notify.display(e.message + ' Fallback Decoding...', 10000);
+    if (engine !== 'hls') {
+      const currentTime = stats.get(s);
+      if (currentTime !== undefined) {
+        video.currentTime = currentTime;
+      }
+      video.play().catch(e => {
+        const src = video.src;
+        notify.display(e.message + ' Fallback Decoding...', 10000);
 
 
-      const mediaSource = new MediaSource();
-      video.src = URL.createObjectURL(mediaSource);
-      video.play().catch(e => notify.display(e.message, 10000));
+        const mediaSource = new MediaSource();
+        video.src = URL.createObjectURL(mediaSource);
+        video.play().catch(e => notify.display(e.message, 10000));
 
-      let sourceBuf;
-      let done = false;
-      const push = buffer => {
-        if (push.once !== true) {
-          notify.clear();
-          // create a buffer using the correct mime type
-          const tracks = muxjs.mp4.probe.tracks(buffer);
+        let sourceBuf;
+        let done = false;
+        const push = buffer => {
+          if (push.once !== true) {
+            notify.clear();
+            // create a buffer using the correct mime type
+            const tracks = muxjs.mp4.probe.tracks(buffer);
 
-          const mime = `video/mp4; codecs="${tracks.map(t => t.codec).join(',')}"`;
-          sourceBuf = mediaSource.addSourceBuffer(mime);
-          sourceBuf.addEventListener('updateend', () => {
-            if (done) {
-              mediaSource.endOfStream();
-            }
-          });
+            const mime = `video/mp4; codecs="${tracks.map(t => t.codec).join(',')}"`;
+            sourceBuf = mediaSource.addSourceBuffer(mime);
+            sourceBuf.addEventListener('updateend', () => {
+              if (done) {
+                mediaSource.endOfStream();
+              }
+            });
 
-          mediaSource.duration = 5;
-          sourceBuf.timestampOffset = 0;
-          sourceBuf.appendBuffer(buffer);
-          push.once = true;
-        }
-        else {
-          mediaSource.duration += 5;
-          sourceBuf.timestampOffset += 5;
-          sourceBuf.appendBuffer(buffer.buffer);
-        }
-      };
+            mediaSource.duration = 5;
+            sourceBuf.timestampOffset = 0;
+            sourceBuf.appendBuffer(buffer);
+            push.once = true;
+          }
+          else {
+            mediaSource.duration += 5;
+            sourceBuf.timestampOffset += 5;
+            sourceBuf.appendBuffer(buffer.buffer);
+          }
+        };
 
-      stream(src, push, () => done = true);
-    });
+        stream(src, push, () => done = true);
+      });
+    }
     window.setTimeout(() => video.focus(), 100);
   },
   stopVideo() {
@@ -181,8 +208,25 @@ const playlist = {
     video.currentTime = 0;
   },
   loadVideo(files) {
-    const index = playlist.entries.length;
-    playlist.cueVideo(files);
+    const playlists = files.filter(f => f.name && hls.isPlaylist(f.name));
+    const fileMap = new Map(files.map(f => [f.path || f.name, f]));
+    const rest = files.filter(f => {
+      if (playlists.includes(f)) {
+        return false;
+      }
+      if (playlists.length && !f.type && hls.isSegment(f.name)) {
+        return false;
+      }
+      return true;
+    });
+    const entries = [...rest, ...playlists.map(f => ({
+      name: f.name,
+      playlist: true,
+      file: f,
+      fileMap
+    }))];
+    const index = playlist.entries.length + (playlists.length ? rest.length : 0);
+    playlist.cueVideo(entries);
     this.play(index);
   },
   cueVideo(files) {
@@ -209,6 +253,43 @@ const playlist = {
   }
 };
 playlist.onStateChange.cs = [];
+
+const hlsFailure = e => {
+  playlist.state = 0;
+  if (e.needsPermission && e.url) {
+    try {
+      const origin = new URL(e.url).origin;
+      if (origin.startsWith('http')) {
+        chrome.permissions.contains({
+          origins: [origin + '/*']
+        }, granted => {
+          if (granted) {
+            notify.display('Cannot load ' + origin, 10000);
+          }
+          else {
+            notify.prompt('Cannot load ' + origin, 'Grant Access', () => {
+              chrome.permissions.request({
+                origins: [origin + '/*']
+              }, ok => {
+                if (ok) {
+                  playlist.play(playlist.index);
+                }
+                else {
+                  notify.display('Permission denied', 10000);
+                }
+              });
+            });
+          }
+        });
+        return;
+      }
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+  notify.display('HLS: ' + e.message, 10000);
+};
 
 video.addEventListener('timeupdate', () => {
   stats.set(video.origin, video.currentTime);
@@ -246,6 +327,10 @@ video.addEventListener('waiting', () => playlist.state = 3);
 video.addEventListener('loadstart', () => playlist.state = 3);
 video.addEventListener('loadedmetadata', () => {
   const d = video.duration;
+  if (!isFinite(d)) {
+    video.origin.e.querySelector('span[data-id=duration]').textContent = 'LIVE';
+    return;
+  }
   const h = Math.floor(d / 3600);
   const m = Math.floor(d % 3600 / 60);
   const s = Math.floor(d % 3600 % 60);

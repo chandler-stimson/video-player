@@ -14,7 +14,7 @@
     <ul id="playlist"></ul>
 
     <div id="buttons">
-      <input type="file" id="file" accept="video/*, audio/*" multiple class="hidden">
+      <input type="file" id="file" accept="video/*, audio/*, .m3u8, .m3u" multiple class="hidden">
       <label id="add" for="file" title="Open local media file">
         <svg viewBox="0 0 512 512">
           <polygon points="448,224 288,224 288,64 224,64 224,224 64,224 64,288 224,288 224,448 288,448 288,288 448,288"/>
@@ -75,7 +75,7 @@
       </label>
     </div>
   </div>
-  <script src="ffmpeg/ffmpeg-core.js"></script>
+  <script src="hls/hls.min.js"></script>
   <script src="ffmpeg/mux.js"></script>
   <script type="module" src="index.mjs"></script>
 </body>
