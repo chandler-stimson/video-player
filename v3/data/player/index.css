@@ -34,7 +34,7 @@ body {
 }
 
 body[data-state="-1"] #video-container::before {
-  content: 'Drag media files or double-click to browse';
+  content: 'Drag media files, paste links, or double-click to browse';
   position: absolute;
   top: 0;
   left: 0;

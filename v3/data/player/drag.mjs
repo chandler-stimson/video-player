@@ -1,8 +1,25 @@
+import hls from './hls.mjs';
+
 const drag = {
   cs: [],
   onDrag(c) {
     drag.cs.push(c);
   }
+};
+
+const LINK_RE = /https?:\/\/[^\s<>"'`]+/g;
+
+const parseLinks = text => {
+  const entries = [];
+  const seen = new Set();
+  for (const match of text.matchAll(LINK_RE)) {
+    const src = match[0].replace(/[.,;:!?)\]}'"]+$/, '');
+    if (src && seen.has(src) === false) {
+      seen.add(src);
+      entries.push({src});
+    }
+  }
+  return entries;
 };
 
 const drop = async es => {
@@ -20,7 +37,8 @@ const drop = async es => {
       file.path = entry.fullPath.replace(/^\//, '');
     }
     if (file.type) {
-      if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+      if (file.type.startsWith('audio/') || file.type.startsWith('video/') ||
+          file.type.includes('mpegurl') || hls.isPlaylist(file.name)) {
         files.push(file);
       }
     }
@@ -63,6 +81,16 @@ const drop = async es => {
 };
 
 document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('paste', e => {
+  const text = (e.clipboardData || {}).getData('text/plain') || '';
+  const entries = parseLinks(text);
+  if (entries.length) {
+    e.preventDefault();
+    for (const c of drag.cs) {
+      c(entries);
+    }
+  }
+});
 document.addEventListener('drop', e => {
   e.preventDefault();
 
